@@ -37,6 +37,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'food_app.apps.FoodAppConfig',
+    'food_api.apps.FoodApiConfig',
+    'users.apps.UsersConfig',
 ]
 
 MIDDLEWARE = [
@@ -74,14 +77,13 @@ WSGI_APPLICATION = 'foodgram.wsgi.application'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
 DATABASES = {
-'default': {
-'ENGINE': 'django.db.backends.postgresql_psycopg2',
-'NAME': 'foodgram',
-'USER': 'foodgram_admin',
-'PASSWORD': 'wjbdcijwbd1kjn2',
-'HOST': '127.0.0.1',
-'PORT': '5432'
-}
+    'default': {'ENGINE': 'django.db.backends.postgresql_psycopg2',
+                'NAME': 'foodgram',
+                'USER': 'foodgram_admin',
+                'PASSWORD': 'wjbdcijwbd1kjn2',
+                'HOST': '127.0.0.1',
+                'PORT': '5432'
+                }
 }
 
 
@@ -125,3 +127,5 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+AUTH_USER_MODEL = 'users.User'
