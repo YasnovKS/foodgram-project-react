@@ -1,0 +1,11 @@
+###
+POST http://127.0.0.1:8000/auth/users/
+Content-Type: application/json
+
+{
+    "username": "Vasia",
+    "email": "vasia1@mail.com",
+    "password": "qwertzxcvb12345",
+    "first_name": "Vasia1",
+    "last_name": "Vasin1"
+}
