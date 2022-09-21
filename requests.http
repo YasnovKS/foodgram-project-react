@@ -1,11 +1,27 @@
 ###
-POST http://127.0.0.1:8000/auth/users/
+POST http://127.0.0.1:8000/api/users/
 Content-Type: application/json
 
 {
-    "username": "Vasia",
-    "email": "vasia1@mail.com",
-    "password": "qwertzxcvb12345",
-    "first_name": "Vasia1",
-    "last_name": "Vasin1"
+    "username": "Kira",
+    "email": "yasnov@mail.ru",
+    "password": "t,fnmgfhjkm",
+    "first_name": "Kira",
+    "last_name": "Yasnov"
 }
+
+###
+GET http://127.0.0.1:8000/api/users/
+Content-Type: application/json
+
+
+
+###
+POST http://127.0.0.1:8000/api/jwt/create/
+Content-Type: application/json
+
+{
+    "username": "Kira",
+    "password": "t,fnmgfhjkm"
+}
+Token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjYzNzcyNTcyLCJqdGkiOiI2MmRhOWI0MTAxYWE0ZDZiOTA5ZmUzNGEyNDJhOTRjZSIsInVzZXJfaWQiOjN9.geqBgNnPvGqBUaBh-yAO0rPsC2OKtZuYc4aLgN760OE"
