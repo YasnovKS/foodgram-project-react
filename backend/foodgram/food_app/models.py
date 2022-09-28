@@ -47,12 +47,15 @@ class Recipe(models.Model):
     description = models.TextField(max_length=1000,
                                    verbose_name='Описание рецепта')
     ingredients = models.ManyToManyField(Ingredient,
-                                         through='RecipeIngredients')
-    tag = models.ForeignKey(Tag,
-                            on_delete=models.SET_NULL,
-                            null=True,
-                            verbose_name='Тег')
-    cooking_time = models.IntegerField(verbose_name='Время приготовления')
+                                         related_name='recipes',
+                                         through='RecipeIngredients',
+                                         verbose_name='Ингредиенты')
+    tags = models.ManyToManyField(Tag,
+                                  related_name='recipes',
+                                  verbose_name='Тег')
+    cooking_time = models.PositiveSmallIntegerField(verbose_name='Время'
+                                                    'приготовления',
+                                                    )
     pub_date = models.DateTimeField(auto_now_add=True,
                                     verbose_name='Дата создания')
 
@@ -66,11 +69,20 @@ class Recipe(models.Model):
 
 
 class RecipeIngredients(models.Model):
-    '''Helping model for many-to-many relationship.'''
+    '''
+    Helping model to many-to-many relationship
+    for recipes and ingredients.
+    '''
     recipe = models.ForeignKey(Recipe,
                                on_delete=models.CASCADE,
                                verbose_name='Рецепт')
     ingredient = models.ForeignKey(Ingredient,
                                    on_delete=models.DO_NOTHING,
                                    verbose_name='Ингредиент')
-    count = models.IntegerField(verbose_name='Количество')
+    amount = models.PositiveSmallIntegerField(verbose_name='Количество')
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=('recipe', 'ingredient'),
+                                    name='unique_recipe_ingredient')
+        ]
