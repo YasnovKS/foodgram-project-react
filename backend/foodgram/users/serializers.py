@@ -20,6 +20,7 @@ class UserSerializer(serializers.ModelSerializer):
             'last_name',
             'is_subscribed'
         )
+        extra_kwargs = {"password": {'write_only': True}}
 
     def get_is_subscribed(self, obj):
         author = obj

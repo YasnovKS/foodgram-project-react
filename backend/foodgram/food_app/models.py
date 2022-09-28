@@ -74,9 +74,11 @@ class RecipeIngredients(models.Model):
     for recipes and ingredients.
     '''
     recipe = models.ForeignKey(Recipe,
+                               related_name='ingredients_list',
                                on_delete=models.CASCADE,
                                verbose_name='Рецепт')
     ingredient = models.ForeignKey(Ingredient,
+                                   related_name='recipes_list',
                                    on_delete=models.DO_NOTHING,
                                    verbose_name='Ингредиент')
     amount = models.PositiveSmallIntegerField(verbose_name='Количество')
@@ -84,5 +86,18 @@ class RecipeIngredients(models.Model):
     class Meta:
         constraints = [
             models.UniqueConstraint(fields=('recipe', 'ingredient'),
-                                    name='unique_recipe_ingredient')
+                                    name='unique_recipe_ingredient_set')
+        ]
+
+
+class RecipeTags(models.Model):
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE,
+                               related_name='tags_list')
+    tag = models.ForeignKey(Tag, on_delete=models.CASCADE,
+                            related_name='recipes_list')
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=('recipe', 'tag'),
+                                    name='unique_recipe_tag_set')
         ]
