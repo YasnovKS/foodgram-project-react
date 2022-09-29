@@ -11,16 +11,58 @@ Content-Type: application/json
 ###
 GET http://127.0.0.1:8000/api/users/
 Content-Type: application/json
-Authorization: Token eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjYzODYzODg5LCJqdGkiOiJlMGIxYWI5NjRiZmQ0ZTg4OGFlNTBmZDA3OGQ4MGZkZCIsInVzZXJfaWQiOjF9.9HjCntJ0xpP5kqJ4ARnXjsbQZLuDMre-Amaf19aA8-8
-
+Authorization: Token baa01c11922a320340184bf0cef9b3b290ad8fc6
 
 ###
-POST http://127.0.0.1:8000/api/jwt/create/
+GET http://127.0.0.1:8000/api/users/me/
+Content-Type: application/json
+Authorization: Token eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjYzOTUwMzM2LCJqdGkiOiI2YjM4MmNhMzYwYmE0OWU0YjU5YTM5M2UzNGRiN2QxNSIsInVzZXJfaWQiOjF9.R2MSHfQKr9ZjnO6lokXaeW-tGRAAgHD8LgqeXZfnODc
+
+###
+POST http://127.0.0.1:8000/api/users/set_password/
+Content-Type: application/json
+Authorization: Token a238faaa6250176d932db8eb8b55c9db4e6b529f
+
+{
+    "new_password": "t,fnmgfhjkm",
+    "current_password": "t,fnmgfhjkm1"
+}
+
+###
+POST http://127.0.0.1:8000/api/auth/token/login/
 Content-Type: application/json
 
 {
     "email": "yasnov.ks@yandex.ru",
     "password": "t,fnmgfhjkm"
 }
+
 ###
-Token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjYzNzcyNTcyLCJqdGkiOiI2MmRhOWI0MTAxYWE0ZDZiOTA5ZmUzNGEyNDJhOTRjZSIsInVzZXJfaWQiOjN9.geqBgNnPvGqBUaBh-yAO0rPsC2OKtZuYc4aLgN760OE"
+GET http://127.0.0.1:8000/api/tags/3/
+Content-Type: application/json
+
+###
+POST http://127.0.0.1:8000/api/recipes/
+Content-Type: application/json
+Authorization: Token 94edcc116cee7c2cc199caff8988e308699c9705
+
+{
+    "ingredients": [
+        {
+            "id": 1000,
+            "amount": 5}
+    ],
+    "tags": [
+        1,
+        2
+    ],
+    "title": "Something",
+    "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAgMAAABieywaAAAACVBMVEUAAAD///9fX1/S0ecCAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAACklEQVQImWNoAAAAggCByxOyYQAAAABJRU5ErkJggg==",
+    "description": "Some text",
+    "cooking_time": 5
+}
+
+###
+GET http://127.0.0.1:8000/api/recipes/1/
+Content-Type: application/json
+Authorization: Token 94edcc116cee7c2cc199caff8988e308699c9705
