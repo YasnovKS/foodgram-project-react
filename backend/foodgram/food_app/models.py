@@ -101,3 +101,11 @@ class RecipeTags(models.Model):
             models.UniqueConstraint(fields=('recipe', 'tag'),
                                     name='unique_recipe_tag_set')
         ]
+
+
+class FavoriteRecipe(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE,
+                             related_name='favorite_recipes',
+                             verbose_name='Избранное')
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE,
+                               related_name='recipe_users')

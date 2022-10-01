@@ -5,7 +5,10 @@ Content-Type: application/json
 {
     "username": "Kirya",
     "email": "yasv@mail.ru",
-    "password": ""
+    "password": "t,fnmgfhjkm",
+    "first_name": "Kira",
+    "last_name": "Yasnov",
+    "is_staff": "True"
 }
 
 ###
@@ -33,7 +36,7 @@ POST http://127.0.0.1:8000/api/auth/token/login/
 Content-Type: application/json
 
 {
-    "email": "yasnov.ks@yandex.ru",
+    "email": "yasv@mail.ru",
     "password": "t,fnmgfhjkm"
 }
 
@@ -44,25 +47,40 @@ Content-Type: application/json
 ###
 POST http://127.0.0.1:8000/api/recipes/
 Content-Type: application/json
-Authorization: Token 94edcc116cee7c2cc199caff8988e308699c9705
+Authorization: Token 974157deae3af043576dd14f0d86e38a20bafc5f
 
 {
     "ingredients": [
         {
-            "id": 1000,
-            "amount": 5}
+            "id": 1111,
+            "amount": 56}
     ],
     "tags": [
         1,
         2
     ],
-    "title": "Something",
+    "title": "Something2",
     "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAgMAAABieywaAAAACVBMVEUAAAD///9fX1/S0ecCAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAACklEQVQImWNoAAAAggCByxOyYQAAAABJRU5ErkJggg==",
-    "description": "Some text",
-    "cooking_time": 5
+    "description": "Some text2",
+    "cooking_time": 10
 }
 
 ###
-GET http://127.0.0.1:8000/api/recipes/1/
+GET http://127.0.0.1:8000/api/recipes/
 Content-Type: application/json
-Authorization: Token 94edcc116cee7c2cc199caff8988e308699c9705
+Authorization: Token 974157deae3af043576dd14f0d86e38a20bafc5f
+
+###
+POST http://127.0.0.1:8000/api/recipes/1/favorite/
+Content-Type: application/json
+Authorization: Token 974157deae3af043576dd14f0d86e38a20bafc5f
+
+###
+POST http://127.0.0.1:8000/api/users/1/subscribe/
+Content-Type: application/json
+Authorization: Token 974157deae3af043576dd14f0d86e38a20bafc5f
+
+###
+DELETE http://127.0.0.1:8000/api/users/1/subscribe/
+Content-Type: application/json
+Authorization: Token 974157deae3af043576dd14f0d86e38a20bafc5f
