@@ -1,5 +1,8 @@
+from django.contrib.auth import get_user_model
 from django.db import models
-from users.models import User
+
+
+User = get_user_model()
 
 
 class Ingredient(models.Model):
@@ -109,3 +112,24 @@ class FavoriteRecipe(models.Model):
                              verbose_name='Избранное')
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE,
                                related_name='recipe_users')
+
+    class Meta:
+        verbose_name = 'Избранное'
+        constraints = [
+            models.UniqueConstraint(fields=('user', 'recipe'),
+                                    name='unique_favorite')
+        ]
+
+
+class ShoppingCart(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE,
+                             related_name='shopping_list')
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE,
+                               related_name='in_users_cart')
+
+    class Meta:
+        verbose_name = 'Список покупок'
+        constraints = [
+            models.UniqueConstraint(fields=('user', 'recipe'),
+                                    name='unique_cart')
+        ]

@@ -1,17 +1,18 @@
-from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
-from food_app.models import FavoriteRecipe, Recipe, Tag
-from users.models import Subscribe, User
+from food_app.models import (FavoriteRecipe, Recipe, Tag, Ingredient,
+                             ShoppingCart)
 from foodgram.settings import INDEX_PAGE_SIZE
-from rest_framework import (filters, pagination, permissions, status, views,
-                            viewsets)
+from rest_framework import (filters, pagination, permissions, serializers,
+                            status, views, viewsets, generics)
 from rest_framework.response import Response
+from users.models import Subscribe, User
 
-from .mixins import ListDetailViewSet
+from .mixins import ListDetailViewSet, GetObjectsViewSet
 from .permissions import EditPermission
-from .serializers import (FavoriteRecipeSerializer, GetRecipeSerializer,
-                          PostRecipeSerializer, TagSerializer,
-                          SubscribeSerializer)
+from .serializers import (ShortRecipeSerializer, GetRecipeSerializer,
+                          PostRecipeSerializer, SubscribeSerializer,
+                          TagSerializer, IngredientSerializer)
+from django.core.exceptions import ObjectDoesNotExist
 
 
 class SubscribeView(views.APIView):
@@ -25,6 +26,9 @@ class SubscribeView(views.APIView):
     def post(self, request, *args, **kwargs):
         user_id = self.kwargs.get('user_id')
         author = get_object_or_404(User, id=user_id)
+        if author == request.user:
+            raise serializers.ValidationError('Нельзя подписаться'
+                                              ' на самого себя.')
         serializer = SubscribeSerializer(author,
                                          context={'request': request}
                                          )
@@ -32,12 +36,11 @@ class SubscribeView(views.APIView):
                               get_or_create(author=author,
                                             follower=request.user)
                               )
-        if created:
-            return Response(serializer.data,
-                            status=status.HTTP_201_CREATED)
-        else:
-            return Response('Вы уже подписаны на автора.',
-                            status=status.HTTP_200_OK)
+        if not created:
+            raise serializers.ValidationError('Вы уже подписаны'
+                                              ' на данного автора.')
+        return Response(serializer.data,
+                        status=status.HTTP_201_CREATED)
 
     def delete(self, request, *args, **kwargs):
         user_id = self.kwargs.get('user_id')
@@ -46,6 +49,15 @@ class SubscribeView(views.APIView):
                                             follower=request.user)
         instance.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class SubscriptionsView(generics.ListAPIView):
+    permission_classes = (permissions.IsAuthenticated,)
+    serializer_class = SubscribeSerializer
+    pagination_class = pagination.PageNumberPagination
+
+    def get_queryset(self):
+        return User.objects.filter(followed__follower=self.request.user)
 
 
 class TagsViewSet(ListDetailViewSet):
@@ -76,28 +88,67 @@ class FavoriteView(views.APIView):
     in "favorite"
     '''
     queryset = Recipe.objects.all()
-    serializer_class = FavoriteRecipeSerializer
+    serializer_class = ShortRecipeSerializer
     permission_classes = (permissions.IsAuthenticated,
                           EditPermission)
 
     def post(self, request, *args, **kwargs):
         recipe_id = self.kwargs.get('recipe_id')
         recipe = get_object_or_404(Recipe, id=recipe_id)
-        serializer = FavoriteRecipeSerializer(recipe)
+        serializer = ShortRecipeSerializer(recipe)
         favorite, created = (FavoriteRecipe.objects.
                              get_or_create(recipe=recipe,
                                            user=request.user))
-        if created:
-            return Response(serializer.data,
-                            status=status.HTTP_201_CREATED)
-        else:
-            return Response('Рецепт уже добавлен в избранное.',
-                            status=status.HTTP_200_OK)
+        if not created:
+            raise serializers.ValidationError('Рецепт уже добавлен'
+                                              ' в избранное.')
+        return Response(serializer.data,
+                        status=status.HTTP_201_CREATED)
 
     def delete(self, request, *args, **kwargs):
         recipe_id = self.kwargs.get('recipe_id')
         recipe = get_object_or_404(Recipe, pk=recipe_id)
         instance = FavoriteRecipe.objects.filter(recipe=recipe,
                                                  user=request.user)
+        if not instance:
+            raise serializers.ValidationError('Рецепт отсутствует'
+                                              ' в избранном.')
+        instance.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class IngredientsViewSet(GetObjectsViewSet):
+    queryset = Ingredient.objects.all()
+    permission_classes = (permissions.AllowAny,)
+    serializer_class = IngredientSerializer
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('$name',)
+    pagination_class = pagination.PageNumberPagination
+
+
+class ShoppingCartView(views.APIView):
+    permission_classes = (permissions.IsAuthenticated,
+                          EditPermission)
+
+    def get(self, request):
+        pass
+
+    def post(self, request, recipe_id):
+        recipe = Recipe.objects.get(pk=recipe_id)
+        serializer = ShortRecipeSerializer(recipe,
+                                           context={'request': request})
+        cart, created = ShoppingCart.objects.get_or_create(recipe=recipe,
+                                                           user=request.user)
+        if not created:
+            raise serializers.ValidationError('Рецепт уже в списке покупок.')
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def delete(self, request, recipe_id):
+        recipe = Recipe.objects.get(pk=recipe_id)
+        instance = ShoppingCart.objects.filter(recipe=recipe,
+                                               user=request.user)
+        if not instance:
+            raise serializers.ValidationError('Рецепт отсутствует в'
+                                              ' списке покупок.')
         instance.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)

@@ -71,6 +71,7 @@ class GetTagsSerializer(serializers.ModelSerializer):
 class IngredientSerializer(serializers.ModelSerializer):
 
     class Meta:
+        model = Ingredient
         fields = '__all__'
 
 
@@ -193,7 +194,7 @@ class PostRecipeSerializer(serializers.ModelSerializer):
         return data
 
 
-class FavoriteRecipeSerializer(serializers.ModelSerializer):
+class ShortRecipeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Recipe
@@ -201,25 +202,14 @@ class FavoriteRecipeSerializer(serializers.ModelSerializer):
         read_only_fields = ('title', 'image', 'cooking_time')
 
 
-class SubscribeSerializer(serializers.ModelSerializer):
-    is_subscribed = serializers.SerializerMethodField()
-    recipes = FavoriteRecipeSerializer(many=True)
+class SubscribeSerializer(UserSerializer):
+    recipes = ShortRecipeSerializer(many=True)
     recipes_count = serializers.SerializerMethodField()
 
     class Meta:
         model = User
         fields = ('email', 'id', 'username', 'first_name', 'last_name',
                   'is_subscribed', 'recipes', 'recipes_count')
-
-    def get_is_subscribed(self, obj):
-        author = obj
-        request = self.context.get('request')
-        try:
-            follower = request.user
-            return Subscribe.objects.filter(follower=follower,
-                                            author=author).exists()
-        except TypeError:
-            return False
 
     def get_recipes_count(self, obj):
         return Recipe.objects.filter(author=obj).count()
