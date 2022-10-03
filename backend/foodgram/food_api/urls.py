@@ -13,6 +13,8 @@ router.register('recipes', RecipeViewSet, basename='recipes')
 router.register('ingredients', IngredientsViewSet, basename='ingredients')
 
 urlpatterns = [
+    path('recipes/download_shopping_cart/', ShoppingCartView.as_view(),
+         name='dowload_cart'),
     path('', include(router.urls), name='food_api'),
     path('recipes/<int:recipe_id>/favorite/', FavoriteView.as_view(),
          name='favorite'),

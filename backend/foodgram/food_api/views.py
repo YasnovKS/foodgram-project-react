@@ -1,6 +1,7 @@
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from food_app.models import (FavoriteRecipe, Recipe, Tag, Ingredient,
-                             ShoppingCart)
+                             ShoppingCart, RecipeIngredients)
 from foodgram.settings import INDEX_PAGE_SIZE
 from rest_framework import (filters, pagination, permissions, serializers,
                             status, views, viewsets, generics)
@@ -12,7 +13,6 @@ from .permissions import EditPermission
 from .serializers import (ShortRecipeSerializer, GetRecipeSerializer,
                           PostRecipeSerializer, SubscribeSerializer,
                           TagSerializer, IngredientSerializer)
-from django.core.exceptions import ObjectDoesNotExist
 
 
 class SubscribeView(views.APIView):
@@ -131,7 +131,28 @@ class ShoppingCartView(views.APIView):
                           EditPermission)
 
     def get(self, request):
-        pass
+        queryset = (RecipeIngredients.objects.
+                    filter(recipe__in_users_cart__user=request.user))
+        shopping_data = dict()
+        for item in queryset:
+            ingredient_id = item.ingredient.id
+            ingredient = item.ingredient
+            unit = item.ingredient.unit
+            amount = item.amount
+            if ingredient_id in shopping_data.keys():
+                shopping_data[ingredient_id]['amount'] += amount
+            shopping_data[ingredient_id] = {'ingredient': ingredient,
+                                            'unit': unit,
+                                            'amount': amount
+                                            }
+        ingredients_list = (f'{value["ingredient"]}: {value["amount"]}'
+                            f' {value["unit"]}'
+                            for value in shopping_data.values())
+        shopping_list = '\n'.join(ingredients_list)
+
+        response = HttpResponse(shopping_list, 'Content-type: text/plain')
+        response['Content-Disposition'] = 'attachment; filename="Shopping.txt"'
+        return response
 
     def post(self, request, recipe_id):
         recipe = Recipe.objects.get(pk=recipe_id)
