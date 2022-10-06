@@ -50,12 +50,13 @@ class Recipe(models.Model):
     description = models.TextField(max_length=1000,
                                    verbose_name='Описание рецепта')
     ingredients = models.ManyToManyField(Ingredient,
-                                         related_name='recipes',
+                                         related_name='ingredients',
                                          through='RecipeIngredients',
                                          verbose_name='Ингредиенты')
     tags = models.ManyToManyField(Tag,
                                   related_name='recipes',
-                                  verbose_name='Тег')
+                                  verbose_name='Тег',
+                                  through='RecipeTags')
     cooking_time = models.PositiveSmallIntegerField(verbose_name='Время'
                                                     'приготовления',
                                                     )
@@ -77,11 +78,11 @@ class RecipeIngredients(models.Model):
     for recipes and ingredients.
     '''
     recipe = models.ForeignKey(Recipe,
-                               related_name='ingredients_list',
+                               related_name='recipes_list',
                                on_delete=models.CASCADE,
                                verbose_name='Рецепт')
     ingredient = models.ForeignKey(Ingredient,
-                                   related_name='recipes_list',
+                                   related_name='ingredients_list',
                                    on_delete=models.DO_NOTHING,
                                    verbose_name='Ингредиент')
     amount = models.PositiveSmallIntegerField(verbose_name='Количество')
@@ -94,6 +95,10 @@ class RecipeIngredients(models.Model):
 
 
 class RecipeTags(models.Model):
+    '''
+    Helping model to many-to-many relationship
+    for recipes and tags.
+    '''
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE,
                                related_name='tags_list')
     tag = models.ForeignKey(Tag, on_delete=models.CASCADE,
@@ -107,6 +112,10 @@ class RecipeTags(models.Model):
 
 
 class FavoriteRecipe(models.Model):
+    '''
+    Helping model which contains objects related
+    to users and their favorite recipes.
+    '''
     user = models.ForeignKey(User, on_delete=models.CASCADE,
                              related_name='favorite_recipes',
                              verbose_name='Избранное')
@@ -122,6 +131,10 @@ class FavoriteRecipe(models.Model):
 
 
 class ShoppingCart(models.Model):
+    '''
+    Model which contains recipes added by users in
+    their shopping cart.
+    '''
     user = models.ForeignKey(User, on_delete=models.CASCADE,
                              related_name='shopping_list')
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE,

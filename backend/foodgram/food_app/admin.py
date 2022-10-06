@@ -1,4 +1,4 @@
-from .models import Ingredient, Recipe, Tag, RecipeIngredients
+from .models import Ingredient, Recipe, Tag, RecipeIngredients, RecipeTags
 from django.contrib import admin
 
 
@@ -6,7 +6,8 @@ from django.contrib import admin
 class RecipeAdmin(admin.ModelAdmin):
     list_display = ('author', 'title', 'description',
                     'cooking_time', 'pub_date')
-    list_filter = ('author', 'title')
+    list_filter = ('author', 'title', 'tags')
+    search_fields = ('author', 'title')
     ordering = ['-pub_date']
 
 
@@ -24,3 +25,4 @@ class TagAdmin(admin.ModelAdmin):
 
 
 admin.site.register(RecipeIngredients)
+admin.site.register(RecipeTags)

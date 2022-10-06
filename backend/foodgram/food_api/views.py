@@ -13,6 +13,9 @@ from .permissions import EditPermission
 from .serializers import (ShortRecipeSerializer, GetRecipeSerializer,
                           PostRecipeSerializer, SubscribeSerializer,
                           TagSerializer, IngredientSerializer)
+from django.db import transaction
+from django_filters.rest_framework import DjangoFilterBackend
+from .filters import RecipeFilter
 
 
 class SubscribeView(views.APIView):
@@ -73,11 +76,13 @@ class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
     pagination_class = pagination.PageNumberPagination
     pagination_class.page_size = INDEX_PAGE_SIZE
-    permission_classes = (EditPermission,
-                          permissions.IsAuthenticatedOrReadOnly)
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,
+                          EditPermission)
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = RecipeFilter
 
     def get_serializer_class(self):
-        if self.action not in ['GET', 'HEAD', 'OPTIONS']:
+        if self.action not in permissions.SAFE_METHODS:
             return PostRecipeSerializer
         return GetRecipeSerializer
 
@@ -131,28 +136,33 @@ class ShoppingCartView(views.APIView):
                           EditPermission)
 
     def get(self, request):
-        queryset = (RecipeIngredients.objects.
-                    filter(recipe__in_users_cart__user=request.user))
-        shopping_data = dict()
-        for item in queryset:
-            ingredient_id = item.ingredient.id
-            ingredient = item.ingredient
-            unit = item.ingredient.unit
-            amount = item.amount
-            if ingredient_id in shopping_data.keys():
-                shopping_data[ingredient_id]['amount'] += amount
-            shopping_data[ingredient_id] = {'ingredient': ingredient,
-                                            'unit': unit,
-                                            'amount': amount
-                                            }
-        ingredients_list = (f'{value["ingredient"]}: {value["amount"]}'
-                            f' {value["unit"]}'
-                            for value in shopping_data.values())
-        shopping_list = '\n'.join(ingredients_list)
+        with transaction.atomic():
+            queryset = (RecipeIngredients.objects.
+                        filter(recipe__in_users_cart__user=request.user))
+            shopping_data = dict()
+            for item in queryset:
+                ingredient_id = item.ingredient.id
+                ingredient = item.ingredient
+                unit = item.ingredient.unit
+                amount = item.amount
+                if ingredient_id in shopping_data.keys():
+                    shopping_data[ingredient_id]['amount'] += amount
+                else:
+                    shopping_data[ingredient_id] = {'ingredient': ingredient,
+                                                    'unit': unit,
+                                                    'amount': amount
+                                                    }
+            ingredients_list = (f'{value["ingredient"]}: {value["amount"]}'
+                                f' {value["unit"]}'
+                                for value in shopping_data.values())
+            shopping_list = '\n'.join(ingredients_list)
 
-        response = HttpResponse(shopping_list, 'Content-type: text/plain')
-        response['Content-Disposition'] = 'attachment; filename="Shopping.txt"'
-        return response
+            ShoppingCart.objects.filter(user=request.user).delete()
+
+            response = HttpResponse(shopping_list, 'Content-type: text/plain')
+            response['Content-Disposition'] = ('attachment; filename='
+                                               '"Shopping.txt"')
+            return response
 
     def post(self, request, recipe_id):
         recipe = Recipe.objects.get(pk=recipe_id)

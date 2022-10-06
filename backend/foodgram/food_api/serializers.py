@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from food_app.models import (FavoriteRecipe, Ingredient, Recipe,
-                             RecipeIngredients, RecipeTags, Tag)
+                             RecipeIngredients, RecipeTags, Tag,
+                             ShoppingCart)
 from rest_framework import serializers
 from users.models import Subscribe
 
@@ -106,11 +107,13 @@ class GetRecipeSerializer(serializers.ModelSerializer):
     tags = serializers.SerializerMethodField()
     ingredients = serializers.SerializerMethodField()
     is_favorited = serializers.SerializerMethodField()
+    is_in_shopping_cart = serializers.SerializerMethodField()
 
     class Meta:
         model = Recipe
         fields = ('id', 'ingredients', 'tags', 'author', 'title',
-                  'description', 'image', 'cooking_time', 'is_favorited')
+                  'description', 'image', 'cooking_time', 'is_favorited',
+                  'is_in_shopping_cart')
 
     def get_ingredients(self, obj):
         queryset = obj.ingredients_list.all()
@@ -125,6 +128,14 @@ class GetRecipeSerializer(serializers.ModelSerializer):
         return (request.user.is_authenticated
                 and FavoriteRecipe.objects.filter(recipe=obj,
                                                   user=request.user).exists()
+                )
+
+    def get_is_in_shopping_cart(self, obj):
+        request = self.context.get('request')
+        return (request.user.is_authenticated
+                and ShoppingCart.objects.filter(recipe=obj,
+                                                user=request.user
+                                                ).exists()
                 )
 
 
