@@ -1,11 +1,10 @@
 from django.contrib.auth import get_user_model
-from food_app.models import (FavoriteRecipe, Ingredient, Recipe,
-                             RecipeIngredients, RecipeTags, Tag,
-                             ShoppingCart)
 from rest_framework import serializers
-from users.models import Subscribe
 
 from .fields import Base64ImageField
+from food_app.models import (FavoriteRecipe, Ingredient, Recipe,
+                             RecipeIngredients, RecipeTags, ShoppingCart, Tag)
+from users.models import Subscribe
 
 User = get_user_model()
 
@@ -82,13 +81,14 @@ class GetIngredientAmountSerializer(serializers.ModelSerializer):
     name = serializers.SlugRelatedField(slug_field='name',
                                         source='ingredient',
                                         read_only=True)
-    unit = serializers.SlugRelatedField(slug_field='unit',
-                                        source='ingredient',
-                                        read_only=True)
+    measurement_unit = (serializers.
+                        SlugRelatedField(slug_field='measurement_unit',
+                                         source='ingredient',
+                                         read_only=True))
 
     class Meta:
         model = RecipeIngredients
-        fields = ('id', 'name', 'unit', 'amount')
+        fields = ('id', 'name', 'measurement_unit', 'amount')
 
 
 class PostIngredientsAmountSerializer(serializers.ModelSerializer):
@@ -116,7 +116,7 @@ class GetRecipeSerializer(serializers.ModelSerializer):
                   'is_in_shopping_cart')
 
     def get_ingredients(self, obj):
-        queryset = obj.ingredients_list.all()
+        queryset = obj.recipes_list.all()
         return GetIngredientAmountSerializer(queryset, many=True).data
 
     def get_tags(self, obj):
@@ -162,6 +162,49 @@ class PostRecipeSerializer(serializers.ModelSerializer):
             'cooking_time'
         )
 
+    def validate(self, data):
+        ingredients = self.initial_data.get('ingredients')
+        tags = self.initial_data.get('tags')
+        checking_ingredients = list()
+
+        for ingredient in ingredients:
+            if not ingredient['id']:
+                raise serializers.ValidationError('Не указаны ингредиенты'
+                                                  ' для рецепта.')
+            if not ingredient['amount'] or ingredient['amount'] < 1:
+                name = Ingredient.objects.get(pk=ingredient['id']).name
+                raise serializers.ValidationError('Не указано количество'
+                                                  f' для {name}')
+            if ingredient['id'] in checking_ingredients:
+                raise serializers.ValidationError('Ингредиенты не могут'
+                                                  ' повторяться.')
+            checking_ingredients.append(ingredient['id'])
+
+        if not tags:
+            raise serializers.ValidationError('Не указаны теги'
+                                              ' для рецепта.')
+        if (not self.initial_data.get('cooking_time')
+                or self.initial_data.get('cooking_time') < 1):
+            raise serializers.ValidationError('Не указано время'
+                                              ' приготовления блюда.')
+        return data
+
+    def create_related_objects(self, recipe, ingredients, tags):
+        ingredients_list = list()
+        tags_list = list()
+        for ingredient in ingredients:
+            ingr_object = RecipeIngredients(recipe=recipe,
+                                            ingredient=ingredient['id'],
+                                            amount=ingredient['amount']
+                                            )
+            ingredients_list.append(ingr_object)
+        for tag in tags:
+            tag_object = RecipeTags(recipe=recipe, tag=tag)
+            tags_list.append(tag_object)
+
+        RecipeIngredients.objects.bulk_create(ingredients_list)
+        RecipeTags.objects.bulk_create(tags_list)
+
     def create(self, validated_data):
         request = self.context['request']
         ingredients = validated_data.pop('ingredients')
@@ -169,14 +212,7 @@ class PostRecipeSerializer(serializers.ModelSerializer):
         recipe = Recipe.objects.create(author=request.user,
                                        **validated_data)
         recipe.save()
-        for ingredient in ingredients:
-            RecipeIngredients.objects.create(recipe=recipe,
-                                             ingredient=ingredient['id'],
-                                             amount=ingredient['amount']
-                                             )
-        for tag in tags:
-            RecipeTags.objects.create(recipe=recipe,
-                                      tag=tag)
+        self.create_related_objects(recipe, ingredients, tags)
         return recipe
 
     def update(self, instance, validated_data):
@@ -186,14 +222,7 @@ class PostRecipeSerializer(serializers.ModelSerializer):
         recipe = Recipe.objects.get(id=instance.id)
         RecipeIngredients.objects.filter(recipe=recipe).delete()
         RecipeTags.objects.filter(recipe=recipe).delete()
-        for ingredient in ingredients:
-            RecipeIngredients.objects.create(recipe=recipe,
-                                             ingredient=ingredient['id'],
-                                             amount=ingredient['amount']
-                                             )
-        for tag in tags:
-            RecipeTags.objects.create(recipe=recipe,
-                                      tag=tag)
+        self.create_related_objects(recipe, ingredients, tags)
         return recipe
 
     def to_representation(self, instance):
@@ -215,7 +244,8 @@ class ShortRecipeSerializer(serializers.ModelSerializer):
 
 class SubscribeSerializer(UserSerializer):
     recipes = ShortRecipeSerializer(many=True)
-    recipes_count = serializers.SerializerMethodField()
+    recipes_count = serializers.IntegerField(source='recipes.count',
+                                             read_only=True)
 
     class Meta:
         model = User

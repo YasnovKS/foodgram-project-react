@@ -1,21 +1,22 @@
+from django.db import transaction
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
-from food_app.models import (FavoriteRecipe, Recipe, Tag, Ingredient,
-                             ShoppingCart, RecipeIngredients)
-from foodgram.settings import INDEX_PAGE_SIZE
-from rest_framework import (filters, pagination, permissions, serializers,
-                            status, views, viewsets, generics)
-from rest_framework.response import Response
-from users.models import Subscribe, User
-
-from .mixins import ListDetailViewSet, GetObjectsViewSet
-from .permissions import EditPermission
-from .serializers import (ShortRecipeSerializer, GetRecipeSerializer,
-                          PostRecipeSerializer, SubscribeSerializer,
-                          TagSerializer, IngredientSerializer)
-from django.db import transaction
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import (filters, generics, pagination, permissions,
+                            serializers, status, views, viewsets)
+from rest_framework.response import Response
+
 from .filters import RecipeFilter
+from .mixins import GetObjectsViewSet, ListDetailViewSet
+from .permissions import EditPermission
+from .serializers import (GetRecipeSerializer, IngredientSerializer,
+                          PostRecipeSerializer, ShortRecipeSerializer,
+                          SubscribeSerializer, TagSerializer)
+from .services import generate_shopping_list
+from food_app.models import (FavoriteRecipe, Ingredient, Recipe,
+                             RecipeIngredients, ShoppingCart, Tag)
+from foodgram.settings import INDEX_PAGE_SIZE
+from users.models import Subscribe, User
 
 
 class SubscribeView(views.APIView):
@@ -139,24 +140,7 @@ class ShoppingCartView(views.APIView):
         with transaction.atomic():
             queryset = (RecipeIngredients.objects.
                         filter(recipe__in_users_cart__user=request.user))
-            shopping_data = dict()
-            for item in queryset:
-                ingredient_id = item.ingredient.id
-                ingredient = item.ingredient
-                unit = item.ingredient.unit
-                amount = item.amount
-                if ingredient_id in shopping_data.keys():
-                    shopping_data[ingredient_id]['amount'] += amount
-                else:
-                    shopping_data[ingredient_id] = {'ingredient': ingredient,
-                                                    'unit': unit,
-                                                    'amount': amount
-                                                    }
-            ingredients_list = (f'{value["ingredient"]}: {value["amount"]}'
-                                f' {value["unit"]}'
-                                for value in shopping_data.values())
-            shopping_list = '\n'.join(ingredients_list)
-
+            shopping_list = generate_shopping_list(queryset)
             ShoppingCart.objects.filter(user=request.user).delete()
 
             response = HttpResponse(shopping_list, 'Content-type: text/plain')

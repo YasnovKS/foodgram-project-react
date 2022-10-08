@@ -1,7 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.db import models
 
-
 User = get_user_model()
 
 
@@ -9,12 +8,16 @@ class Ingredient(models.Model):
     '''Model for creating ingredients.'''
     name = models.CharField(max_length=100,
                             verbose_name='Название')
-    unit = models.CharField(max_length=20,
-                            verbose_name='Ед. изм.')
+    measurement_unit = models.CharField(max_length=20,
+                                        verbose_name='Ед. изм.')
 
     class Meta:
         verbose_name = 'Ингредиент'
         verbose_name_plural = 'Ингредиенты'
+        constraints = [
+            models.UniqueConstraint(fields=('name', 'measurement_unit'),
+                                    name='unique_ingredient')
+        ]
 
     def __str__(self):
         return (self.name)
@@ -33,6 +36,10 @@ class Tag(models.Model):
     class Meta:
         verbose_name = 'Тег'
         verbose_name_plural = 'Теги'
+        constraints = [
+            models.UniqueConstraint(fields=('title', 'color'),
+                                    name='unique_tag')
+        ]
 
     def __str__(self):
         return self.title
@@ -88,6 +95,8 @@ class RecipeIngredients(models.Model):
     amount = models.PositiveSmallIntegerField(verbose_name='Количество')
 
     class Meta:
+        verbose_name = 'Ингредиент в рецепте'
+        verbose_name_plural = 'Ингредиенты в рецептах'
         constraints = [
             models.UniqueConstraint(fields=('recipe', 'ingredient'),
                                     name='unique_recipe_ingredient_set')
@@ -105,6 +114,8 @@ class RecipeTags(models.Model):
                             related_name='recipes_list')
 
     class Meta:
+        verbose_name = 'Тег для рецепта'
+        verbose_name_plural = 'Теги для рецептов'
         constraints = [
             models.UniqueConstraint(fields=('recipe', 'tag'),
                                     name='unique_recipe_tag_set')
@@ -124,6 +135,7 @@ class FavoriteRecipe(models.Model):
 
     class Meta:
         verbose_name = 'Избранное'
+        verbose_name_plural = 'Избранное'
         constraints = [
             models.UniqueConstraint(fields=('user', 'recipe'),
                                     name='unique_favorite')

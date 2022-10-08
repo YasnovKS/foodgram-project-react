@@ -1,20 +1,57 @@
-from .models import Ingredient, Recipe, Tag, RecipeIngredients, RecipeTags
 from django.contrib import admin
+from django.contrib.auth import get_user_model
+
+from .models import (FavoriteRecipe, Ingredient, Recipe, RecipeIngredients,
+                     RecipeTags, ShoppingCart, Tag)
+
+User = get_user_model()
+
+
+class RecipeIngredientsInline(admin.TabularInline):
+    model = RecipeIngredients
+    min_num = 1
+
+
+class TagsInline(admin.TabularInline):
+    model = RecipeTags
+    min_num = 1
+
+
+@admin.register(User)
+class UserAdmin(admin.ModelAdmin):
+    list_display = ('username', 'email', 'first_name', 'last_name')
+    search_fields = ('first_name', 'email')
 
 
 @admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
     list_display = ('author', 'title', 'description',
-                    'cooking_time', 'pub_date')
-    list_filter = ('author', 'title', 'tags')
-    search_fields = ('author', 'title')
+                    'cooking_time', 'pub_date', 'display_tags',
+                    'display_ingredients', 'in_favorites')
+    list_filter = ('author', 'title', 'tags', 'ingredients')
+    search_fields = ('author__first_name', 'author__email', 'title',
+                     'tags__title', 'ingredients__name')
     ordering = ['-pub_date']
+    inlines = (RecipeIngredientsInline, TagsInline)
+
+    def display_ingredients(self, obj):
+        return list([ingredient.name for ingredient in obj.ingredients.all()])
+    display_ingredients.short_description = 'Ингредиенты'
+
+    def display_tags(self, obj):
+        return list([tag.title for tag in obj.tags.all()])
+    display_tags.short_description = 'Теги'
+
+    def in_favorites(self, obj):
+        return FavoriteRecipe.objects.filter(recipe=obj).count()
+    in_favorites.short_description = 'В избранном'
 
 
 @admin.register(Ingredient)
 class IngredientAdmin(admin.ModelAdmin):
-    list_display = ('name', 'unit')
+    list_display = ('name', 'measurement_unit')
     list_filter = ('name',)
+    search_fields = ('name',)
     ordering = ['name']
 
 
@@ -22,6 +59,19 @@ class IngredientAdmin(admin.ModelAdmin):
 class TagAdmin(admin.ModelAdmin):
     list_display = ('title', 'color', 'slug')
     list_filter = ('title', 'color')
+
+
+@admin.register(FavoriteRecipe)
+class FavoriteRecipeAdmin(admin.ModelAdmin):
+    list_display = ('user', 'recipe')
+    list_filter = ('user',)
+
+
+@admin.register(ShoppingCart)
+class ShoppingCartAdmin(admin.ModelAdmin):
+    list_display = ('user', 'recipe')
+    list_filter = ('user',)
+    search_fields = ('user__username', 'user__email', 'recipe__title')
 
 
 admin.site.register(RecipeIngredients)
