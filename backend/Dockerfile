@@ -8,7 +8,7 @@ RUN apt-get update \
     && apt-get -y install libpq-dev gcc \
     && pip install psycopg2
 
-COPY ../requirements.txt /backend
+COPY ./requirements.txt .
 
 RUN pip install -r requirements.txt --no-cache-dir
 
