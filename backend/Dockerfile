@@ -16,6 +16,6 @@ COPY . .
 
 WORKDIR /backend/foodgram
 
-RUN python3 manage.py migrate
+ENTRYPOINT [ "../entrypoint.sh" ]
 
 CMD ["gunicorn", "foodgram.wsgi:application", "--bind", "0:8000"]
