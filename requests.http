@@ -1,0 +1,126 @@
+###
+POST http://127.0.0.1:8000/api/users/
+Content-Type: application/json
+
+{
+    "username": "Hahsc",
+    "email": "5@5.ru",
+    "password": "t,fnmgfhjkm",
+    "first_name": "Kirill",
+    "last_name": "Yasnov"
+}
+
+###
+GET http://127.0.0.1:8000/api/users/
+Content-Type: application/json
+Authorization: Token af8e906eb679b22200509ff6275f7ae9a07eaa03
+
+{
+    "current_password": "t,fnmgfhjkm"
+}
+
+###
+GET http://127.0.0.1:8000/api/users/me/
+Content-Type: application/json
+Authorization: Token 974157deae3af043576dd14f0d86e38a20bafc5f
+
+###
+POST http://127.0.0.1:8000/api/users/set_password/
+Content-Type: application/json
+Authorization: Token a238faaa6250176d932db8eb8b55c9db4e6b529f
+
+{
+    "new_password": "t,fnmgfhjkm",
+    "current_password": "t,fnmgfhjkm1"
+}
+
+###
+POST http://127.0.0.1:8000/api/auth/token/login/
+Content-Type: application/json
+
+{
+    "email": "5@5.ru",
+    "password": "t,fnmgfhjkm"
+}
+
+###
+GET http://127.0.0.1:8000/api/tags/3/
+Content-Type: application/json
+
+###
+POST http://127.0.0.1:8000/api/recipes/
+Content-Type: application/json
+Authorization: Token af8e906eb679b22200509ff6275f7ae9a07eaa03
+
+{
+    "ingredients": [
+        {
+            "id": 29,
+            "amount": 50
+        },
+        {
+            "id": 69,
+            "amount": 30
+        },
+        {
+            "id": 10,
+            "amount": 30
+        }
+    ],
+    "tags": [
+        1
+    ],
+    "title": "SomethingSpecial",
+    "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAgMAAABieywaAAAACVBMVEUAAAD///9fX1/S0ecCAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAACklEQVQImWNoAAAAggCByxOyYQAAAABJRU5ErkJggg==",
+    "description": "Some special text",
+    "cooking_time": 53
+}
+
+###
+GET http://127.0.0.1:8000/api/recipes/
+Content-Type: application/json
+Authorization: Token af8e906eb679b22200509ff6275f7ae9a07eaa03
+
+###
+POST http://127.0.0.1:8000/api/recipes/2/favorite/
+Content-Type: application/json
+Authorization: Token 1d3675f4e5625a8b6b1a640339bb8b5dd0a72a76
+
+###
+POST http://127.0.0.1:8000/api/users/1/subscribe/
+Content-Type: application/json
+Authorization: Token 1d3675f4e5625a8b6b1a640339bb8b5dd0a72a76
+
+###
+DELETE http://127.0.0.1:8000/api/users/1/subscribe/
+Content-Type: application/json
+Authorization: Token 1d3675f4e5625a8b6b1a640339bb8b5dd0a72a76
+
+###
+GET http://127.0.0.1:8000/api/users/subscriptions/
+Content-Type: application/json
+Authorization: Token 1d3675f4e5625a8b6b1a640339bb8b5dd0a72a76
+
+
+###
+GET http://127.0.0.1:8000/api/ingredients/666/
+Content-Type: application/json
+
+###
+POST http://127.0.0.1:8000/api/recipes/4/shopping_cart/
+Content-Type: application/json
+Authorization: Token 1d3675f4e5625a8b6b1a640339bb8b5dd0a72a76
+
+###
+DELETE http://127.0.0.1:8000/api/recipes/4/shopping_cart/
+Content-Type: application/json
+Authorization: Token 974157deae3af043576dd14f0d86e38a20bafc5f
+
+###
+GET http://127.0.0.1:8000/api/recipes/download_shopping_cart/
+Content-Type: application/json
+Authorization: Token 1d3675f4e5625a8b6b1a640339bb8b5dd0a72a76
+
+###
+GET http://127.0.0.1:8000/api/recipes/?tags=dinner
+Content-Type: application/json
