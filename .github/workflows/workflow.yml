@@ -61,7 +61,6 @@ jobs:
           username: ${{ secrets.SERVER_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
-          stack_file_name: docker-compose.yml
           script: |
             sudo docker-compose stop
             sudo docker-compose rm backend
