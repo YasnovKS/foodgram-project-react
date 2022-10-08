@@ -64,12 +64,12 @@ WSGI_APPLICATION = 'foodgram.wsgi.application'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
 DATABASES = {
-    'default': {'ENGINE': 'django.db.backends.postgresql_psycopg2',
-                'NAME': 'foodgram',
-                'USER': 'foodgram_admin',
-                'PASSWORD': 'wjbdcijwbd1kjn2',
-                'HOST': '127.0.0.1',
-                'PORT': '5432'
+    'default': {'ENGINE': os.getenv('DB_ENGINE'),
+                'NAME': os.getenv('POSTGRES_DB'),
+                'USER': os.getenv('POSTGRES_USER'),
+                'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
+                'HOST': os.getenv('DB_HOST'),
+                'PORT': os.getenv('DB_PORT')
                 }
 }
 
