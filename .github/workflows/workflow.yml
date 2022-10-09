@@ -72,8 +72,8 @@ jobs:
             echo POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} >> .env
             echo DB_HOST=${{ secrets.DB_HOST }} >> .env
             sudo docker-compose up -d
-            sudo docker-compose exec -T backend python frontend/manage.py makemigrations users --no-input
-            sudo docker-compose exec -T backend python frontend/manage.py makemigrations food_app --no-input
-            sudo docker-compose exec -T backend python frontend/manage.py migrate --no-input
-            sudo docker-compose exec -T backend python frontend/manage.py import_data --no-input
+            sudo docker-compose exec -T backend python foodgram/manage.py makemigrations users --no-input
+            sudo docker-compose exec -T backend python foodgram/manage.py makemigrations food_app --no-input
+            sudo docker-compose exec -T backend python foodgram/manage.py migrate --no-input
+            sudo docker-compose exec -T backend python foodgram/manage.py import_data --no-input
 # changing string
