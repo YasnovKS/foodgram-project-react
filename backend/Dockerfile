@@ -16,6 +16,4 @@ COPY . .
 
 WORKDIR /backend/foodgram
 
-ENTRYPOINT [ "../entrypoint.sh" ]
-
 CMD ["gunicorn", "foodgram.wsgi:application", "--bind", "0:8000"]
