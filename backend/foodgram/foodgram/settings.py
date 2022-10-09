@@ -153,4 +153,4 @@ DJOSER = {
 
 INDEX_PAGE_SIZE = 6  # amount of recipes on index page
 
-SRF_TRUSTED_ORIGINS = ['http://...']
+SRF_TRUSTED_ORIGINS = ['*']
