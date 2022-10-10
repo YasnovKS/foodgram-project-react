@@ -42,7 +42,7 @@ class Tag(models.Model):
         ]
 
     def __str__(self):
-        return self.title
+        return self.name
 
 
 class Recipe(models.Model):
@@ -76,7 +76,7 @@ class Recipe(models.Model):
         verbose_name_plural = 'Рецепты'
 
     def __str__(self):
-        return self.title
+        return self.name
 
 
 class RecipeIngredients(models.Model):
