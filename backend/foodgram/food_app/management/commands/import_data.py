@@ -15,7 +15,7 @@ class Command(BaseCommand):
                 for row in data:
                     Ingredient.objects.get_or_create(
                         name=row[0],
-                        unit=row[1]
+                        measurement_unit=row[1]
                     )
             with open('../data/tags.csv', 'r') as file:
                 data = csv.reader(file, delimiter=',')
@@ -25,7 +25,7 @@ class Command(BaseCommand):
                         color=row[1],
                         slug=row[2]
                     )
-        except Exception:
-            raise CommandError('Import error')
+        except Exception as e:
+            raise CommandError(f'Import error {e}')
 
         self.stdout.write(self.style.SUCCESS('Data imported successfully'))
