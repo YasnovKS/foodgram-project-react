@@ -48,7 +48,7 @@ jobs:
           context: ./backend/
           tags: ${{ secrets.DOCKER_LOGIN }}/foodgram_backend:v1
   
-  build_and_push_backend:
+  build_and_push_frontend:
   name: Push Docker image to Docker Hub
   runs-on: ubuntu-20.04
   needs: tests
