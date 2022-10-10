@@ -53,9 +53,9 @@ class TagSerializer(serializers.ModelSerializer):
 class GetTagsSerializer(serializers.ModelSerializer):
     id = serializers.PrimaryKeyRelatedField(source='tag',
                                             read_only=True)
-    title = serializers.SlugRelatedField(source='tag',
-                                         slug_field='name',
-                                         read_only=True)
+    name = serializers.SlugRelatedField(source='tag',
+                                        slug_field='name',
+                                        read_only=True)
     color = serializers.SlugRelatedField(source='tag',
                                          slug_field='color',
                                          read_only=True)
