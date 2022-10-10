@@ -36,19 +36,6 @@ class UserSerializer(serializers.ModelSerializer):
             return False
 
 
-class RecipeImageSerializer(serializers.ModelSerializer):
-    image = serializers.SerializerMethodField()
-
-    class Meta:
-        model = Recipe
-        fields = ('id', 'name', 'image', 'cooking_time')
-
-    def get_image(self, obj):
-        request = self.context.get('request')
-        image_url = obj.image.url
-        return request.build_absolute_uri(image_url)
-
-
 class TagSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -253,13 +240,6 @@ class ShortRecipeSerializer(serializers.ModelSerializer):
         model = Recipe
         fields = ('id', 'title', 'image', 'cooking_time')
         read_only_fields = ('title', 'image', 'cooking_time')
-
-    def to_representation(self, instance):
-        requset = self.context.get('request')
-        return RecipeImageSerializer(
-            instance.recipe,
-            context={'request': requset}
-        ).data
 
 
 class SubscribeSerializer(UserSerializer):
