@@ -11,7 +11,7 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 
 DEBUG = True
 
-ALLOWED_HOSTS = ['51.250.71.61', 'localhost', 'backend']
+ALLOWED_HOSTS = ['62.84.117.181', 'localhost', 'backend']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -153,4 +153,4 @@ DJOSER = {
 
 INDEX_PAGE_SIZE = 6  # amount of recipes on index page
 
-CSRF_TRUSTED_ORIGINS = ['http://51.250.71.61']
+CSRF_TRUSTED_ORIGINS = ['http://62.84.117.181']
