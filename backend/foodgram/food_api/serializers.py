@@ -43,7 +43,7 @@ class TagSerializer(serializers.ModelSerializer):
 
         fields = (
             'id',
-            'title',
+            'name',
             'color',
             'slug'
         )
@@ -54,7 +54,7 @@ class GetTagsSerializer(serializers.ModelSerializer):
     id = serializers.PrimaryKeyRelatedField(source='tag',
                                             read_only=True)
     title = serializers.SlugRelatedField(source='tag',
-                                         slug_field='title',
+                                         slug_field='name',
                                          read_only=True)
     color = serializers.SlugRelatedField(source='tag',
                                          slug_field='color',
@@ -65,7 +65,7 @@ class GetTagsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = RecipeTags
-        fields = ('id', 'title', 'color', 'slug')
+        fields = ('id', 'name', 'color', 'slug')
 
 
 class IngredientSerializer(serializers.ModelSerializer):
@@ -105,13 +105,14 @@ class PostIngredientsAmountSerializer(serializers.ModelSerializer):
 class GetRecipeSerializer(serializers.ModelSerializer):
     author = UserSerializer(read_only=True)
     tags = serializers.SerializerMethodField()
+    image = Base64ImageField()
     ingredients = serializers.SerializerMethodField()
     is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
 
     class Meta:
         model = Recipe
-        fields = ('id', 'ingredients', 'tags', 'author', 'title',
+        fields = ('id', 'ingredients', 'tags', 'author', 'name',
                   'description', 'image', 'cooking_time', 'is_favorited',
                   'is_in_shopping_cart')
 
@@ -156,7 +157,7 @@ class PostRecipeSerializer(serializers.ModelSerializer):
             'tags',
             'ingredients',
             'author',
-            'title',
+            'name',
             'image',
             'description',
             'cooking_time'
@@ -235,11 +236,12 @@ class PostRecipeSerializer(serializers.ModelSerializer):
 
 
 class ShortRecipeSerializer(serializers.ModelSerializer):
+    image = Base64ImageField()
 
     class Meta:
         model = Recipe
-        fields = ('id', 'title', 'image', 'cooking_time')
-        read_only_fields = ('title', 'image', 'cooking_time')
+        fields = ('id', 'name', 'image', 'cooking_time')
+        read_only_fields = ('name', 'image', 'cooking_time')
 
 
 class SubscribeSerializer(UserSerializer):

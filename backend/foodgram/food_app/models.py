@@ -25,8 +25,8 @@ class Ingredient(models.Model):
 
 class Tag(models.Model):
     '''This model defines tags for taggins recipes.'''
-    title = models.CharField(max_length=50,
-                             verbose_name='Название')
+    name = models.CharField(max_length=50,
+                            verbose_name='Название')
     color = models.CharField(max_length=50,
                              verbose_name='Цвет тега')
     slug = models.SlugField(unique=True,
@@ -37,7 +37,7 @@ class Tag(models.Model):
         verbose_name = 'Тег'
         verbose_name_plural = 'Теги'
         constraints = [
-            models.UniqueConstraint(fields=('title', 'color'),
+            models.UniqueConstraint(fields=('name', 'color'),
                                     name='unique_tag')
         ]
 
@@ -51,8 +51,8 @@ class Recipe(models.Model):
                                on_delete=models.CASCADE,
                                verbose_name='Автор',
                                related_name='recipes')
-    title = models.CharField(max_length=300,
-                             verbose_name='Название')
+    name = models.CharField(max_length=300,
+                            verbose_name='Название')
     image = models.ImageField(verbose_name='Картинка')
     description = models.TextField(max_length=1000,
                                    verbose_name='Описание рецепта')

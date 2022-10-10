@@ -25,12 +25,12 @@ class UserAdmin(admin.ModelAdmin):
 
 @admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
-    list_display = ('author', 'title', 'description',
+    list_display = ('author', 'name', 'description',
                     'cooking_time', 'pub_date', 'display_tags',
                     'display_ingredients', 'in_favorites')
-    list_filter = ('author', 'title', 'tags', 'ingredients')
-    search_fields = ('author__first_name', 'author__email', 'title',
-                     'tags__title', 'ingredients__name')
+    list_filter = ('author', 'name', 'tags', 'ingredients')
+    search_fields = ('author__first_name', 'author__email', 'name',
+                     'tags__name', 'ingredients__name')
     ordering = ['-pub_date']
     inlines = (RecipeIngredientsInline, TagsInline)
 
@@ -39,7 +39,7 @@ class RecipeAdmin(admin.ModelAdmin):
     display_ingredients.short_description = 'Ингредиенты'
 
     def display_tags(self, obj):
-        return list([tag.title for tag in obj.tags.all()])
+        return list([tag.name for tag in obj.tags.all()])
     display_tags.short_description = 'Теги'
 
     def in_favorites(self, obj):
@@ -57,8 +57,8 @@ class IngredientAdmin(admin.ModelAdmin):
 
 @admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):
-    list_display = ('title', 'color', 'slug')
-    list_filter = ('title', 'color')
+    list_display = ('name', 'color', 'slug')
+    list_filter = ('name', 'color')
 
 
 @admin.register(FavoriteRecipe)
@@ -71,7 +71,7 @@ class FavoriteRecipeAdmin(admin.ModelAdmin):
 class ShoppingCartAdmin(admin.ModelAdmin):
     list_display = ('user', 'recipe')
     list_filter = ('user',)
-    search_fields = ('user__username', 'user__email', 'recipe__title')
+    search_fields = ('user__username', 'user__email', 'recipe__name')
 
 
 admin.site.register(RecipeIngredients)
