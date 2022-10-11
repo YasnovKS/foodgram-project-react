@@ -6,7 +6,7 @@ from rest_framework import (filters, generics, pagination, permissions,
                             serializers, status, views, viewsets)
 from rest_framework.response import Response
 
-from .filters import RecipeFilter, IngredientFilter
+from .filters import IngredientFilter, RecipeFilter
 from .mixins import GetObjectsViewSet, ListDetailViewSet
 from .permissions import EditPermission
 from .serializers import (GetRecipeSerializer, IngredientSerializer,
