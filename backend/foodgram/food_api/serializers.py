@@ -184,7 +184,7 @@ class PostRecipeSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError('Не указаны теги'
                                               ' для рецепта.')
         if (not self.initial_data.get('cooking_time')
-                or self.initial_data.get('cooking_time') < 1):
+                or int(self.initial_data.get('cooking_time')) < 1):
             raise serializers.ValidationError('Не указано время'
                                               ' приготовления блюда.')
         return data
