@@ -7,7 +7,7 @@ from rest_framework.response import Response
 
 from .filters import IngredientFilter, RecipeFilter
 from .mixins import GetObjectsViewSet, ListDetailViewSet
-from .permissions import EditPermission
+from .permissions import EditPermission, IsOwnerOrReadOnly
 from .serializers import (GetRecipeSerializer, IngredientSerializer,
                           PostRecipeSerializer, ShortRecipeSerializer,
                           SubscribeSerializer, TagSerializer)
@@ -74,7 +74,7 @@ class TagsViewSet(ListDetailViewSet):
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,
-                          EditPermission)
+                          IsOwnerOrReadOnly)
     filterset_class = RecipeFilter
 
     def get_serializer_class(self):
