@@ -171,7 +171,7 @@ class PostRecipeSerializer(serializers.ModelSerializer):
             if not ingredient['id']:
                 raise serializers.ValidationError('Не указаны ингредиенты'
                                                   ' для рецепта.')
-            if not ingredient['amount'] or ingredient['amount'] < 1:
+            if not ingredient['amount'] or int(ingredient['amount']) < 1:
                 name = Ingredient.objects.get(pk=ingredient['id']).name
                 raise serializers.ValidationError('Не указано количество'
                                                   f' для {name}')
