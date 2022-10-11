@@ -1,7 +1,6 @@
 from django.db import transaction
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
-from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import (filters, generics, pagination, permissions,
                             serializers, status, views, viewsets)
 from rest_framework.response import Response
@@ -79,7 +78,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
     pagination_class.page_size = INDEX_PAGE_SIZE
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,
                           EditPermission)
-    filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
 
     def get_serializer_class(self):
