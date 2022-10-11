@@ -25,7 +25,7 @@ class UserAdmin(admin.ModelAdmin):
 
 @admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
-    list_display = ('author', 'name', 'description',
+    list_display = ('author', 'name', 'text',
                     'cooking_time', 'pub_date', 'display_tags',
                     'display_ingredients', 'in_favorites')
     list_filter = ('author', 'name', 'tags', 'ingredients')
