@@ -14,7 +14,6 @@ from .serializers import (GetRecipeSerializer, IngredientSerializer,
 from .services import generate_shopping_list
 from food_app.models import (FavoriteRecipe, Ingredient, Recipe,
                              RecipeIngredients, ShoppingCart, Tag)
-from foodgram.settings import INDEX_PAGE_SIZE
 from users.models import Subscribe, User
 
 
@@ -74,8 +73,6 @@ class TagsViewSet(ListDetailViewSet):
 
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
-    pagination_class = pagination.PageNumberPagination
-    pagination_class.page_size = INDEX_PAGE_SIZE
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,
                           EditPermission)
     filterset_class = RecipeFilter
