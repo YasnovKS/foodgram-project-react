@@ -69,7 +69,7 @@ class TagsViewSet(ListDetailViewSet):
     serializer_class = TagSerializer
     filter_backends = (filters.SearchFilter,)
     search_fields = ('$name',)
-    pagination_class = pagination.PageNumberPagination
+    pagination_class = None
     permission_classes = (permissions.AllowAny,)
 
 
