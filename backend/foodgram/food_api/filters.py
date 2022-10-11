@@ -4,11 +4,11 @@ from food_app.models import Ingredient, Recipe
 
 
 class IngredientFilter(filter.FilterSet):
-    name = filter.CharFilter(field_name='name')
+    name = filter.CharFilter(field_name="name", lookup_expr='icontains')
 
     class Meta:
         model = Ingredient
-        fields = ('name',)
+        fields = ('name', )
 
 
 class RecipeFilter(filter.FilterSet):

@@ -6,7 +6,7 @@ from rest_framework import (filters, generics, pagination, permissions,
                             serializers, status, views, viewsets)
 from rest_framework.response import Response
 
-from .filters import RecipeFilter
+from .filters import RecipeFilter, IngredientFilter
 from .mixins import GetObjectsViewSet, ListDetailViewSet
 from .permissions import EditPermission
 from .serializers import (GetRecipeSerializer, IngredientSerializer,
@@ -127,7 +127,8 @@ class IngredientsViewSet(GetObjectsViewSet):
     queryset = Ingredient.objects.all()
     permission_classes = (permissions.AllowAny,)
     serializer_class = IngredientSerializer
-    search_fields = ('^name',)
+    filter_backends = (DjangoFilterBackend,)
+    filter_class = IngredientFilter
     pagination_class = None
 
 
