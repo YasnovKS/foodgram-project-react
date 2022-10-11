@@ -127,7 +127,6 @@ class IngredientsViewSet(GetObjectsViewSet):
     queryset = Ingredient.objects.all()
     permission_classes = (permissions.AllowAny,)
     serializer_class = IngredientSerializer
-    filter_backends = (filters.SearchFilter,)
     search_fields = ['@name']
     pagination_class = None
 
