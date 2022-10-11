@@ -3,7 +3,7 @@ from django_filters import rest_framework as filter
 from food_app.models import Ingredient, Recipe
 
 
-class IngredientFilter(filter.Filterset):
+class IngredientFilter(filter.FilterSet):
     name = filter.CharFilter(field_name='name')
 
     class Meta:
