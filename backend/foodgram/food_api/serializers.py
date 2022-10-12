@@ -243,7 +243,7 @@ class ShortRecipeSerializer(serializers.ModelSerializer):
 
 
 class SubscribeSerializer(UserSerializer):
-    recipes = ShortRecipeSerializer(many=True)
+    recipes = serializers.SerializerMethodField()
     recipes_count = serializers.IntegerField(source='recipes.count',
                                              read_only=True)
 
@@ -254,3 +254,13 @@ class SubscribeSerializer(UserSerializer):
 
     def get_recipes_count(self, obj):
         return Recipe.objects.filter(author=obj).count()
+
+    def get_recipes(self, obj):
+        request = self.context.get('request')
+        limit_value = request.get('recipes_limit')
+        recipes = obj.recipes.all()[:limit_value]
+        request = self.context.get('request')
+        return ShortRecipeSerializer(
+            recipes, many=True,
+            context={'request': request}
+        ).data
