@@ -257,7 +257,7 @@ class SubscribeSerializer(UserSerializer):
 
     def get_recipes(self, obj):
         request = self.context.get('request')
-        limit_value = request.get('recipes_limit')
+        limit_value = int(request.recipes_limit)
         recipes = obj.recipes.all()[:limit_value]
         request = self.context.get('request')
         return ShortRecipeSerializer(
