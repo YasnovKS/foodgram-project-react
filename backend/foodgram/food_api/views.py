@@ -54,7 +54,7 @@ class SubscribeView(views.APIView):
 
 
 class SubscriptionsView(generics.ListAPIView):
-    permission_classes = (permissions.IsAuthenticated,)
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
     serializer_class = SubscribeSerializer
     pagination_class = pagination.PageNumberPagination
 
