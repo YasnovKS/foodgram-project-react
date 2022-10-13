@@ -151,5 +151,4 @@ DJOSER = {
     'HIDE_USERS': False
 }
 
-
 CSRF_TRUSTED_ORIGINS = ['http://51.250.77.115']
