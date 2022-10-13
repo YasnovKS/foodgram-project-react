@@ -133,7 +133,6 @@ class ShoppingCartView(views.APIView):
         queryset = (RecipeIngredients.objects.
                     filter(recipe__in_users_cart__user=request.user))
         shopping_list = generate_shopping_list(queryset)
-        ShoppingCart.objects.filter(user=request.user).delete()
 
         response = HttpResponse(shopping_list, 'Content-type: text/plain')
         response['Content-Disposition'] = ('attachment; filename='
