@@ -151,6 +151,5 @@ DJOSER = {
     'HIDE_USERS': False
 }
 
-INDEX_PAGE_SIZE = 6  # amount of recipes on index page
 
 CSRF_TRUSTED_ORIGINS = ['http://51.250.77.115']
