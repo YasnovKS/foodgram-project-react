@@ -171,10 +171,14 @@ class PostRecipeSerializer(serializers.ModelSerializer):
             if not ingredient['id']:
                 raise serializers.ValidationError('Не указаны ингредиенты'
                                                   ' для рецепта.')
-            if not ingredient['amount'] or int(ingredient['amount']) < 1:
+            if not ingredient['amount']:
                 name = Ingredient.objects.get(pk=ingredient['id']).name
                 raise serializers.ValidationError('Не указано количество'
                                                   f' для {name}')
+            if int(ingredient['amount']) < 1:
+                name = Ingredient.objects.get(pk=ingredient['id']).name
+                raise serializers.ValidationError('Некорректно указано'
+                                                  f' количество для {name}')
             if ingredient['id'] in checking_ingredients:
                 raise serializers.ValidationError('Ингредиенты не могут'
                                                   ' повторяться.')
@@ -183,9 +187,11 @@ class PostRecipeSerializer(serializers.ModelSerializer):
         if not tags:
             raise serializers.ValidationError('Не указаны теги'
                                               ' для рецепта.')
-        if (not self.initial_data.get('cooking_time')
-                or int(self.initial_data.get('cooking_time')) < 1):
+        if not self.initial_data.get('cooking_time'):
             raise serializers.ValidationError('Не указано время'
+                                              ' приготовления блюда.')
+        if int(self.initial_data.get('cooking_time')) < 1:
+            raise serializers.ValidationError('Некорректно указано время'
                                               ' приготовления блюда.')
         return data
 
