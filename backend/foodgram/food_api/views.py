@@ -1,4 +1,3 @@
-from django.db import transaction
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from rest_framework import (filters, generics, pagination, permissions,
@@ -131,16 +130,15 @@ class ShoppingCartView(views.APIView):
                           EditPermission)
 
     def get(self, request):
-        with transaction.atomic():
-            queryset = (RecipeIngredients.objects.
-                        filter(recipe__in_users_cart__user=request.user))
-            shopping_list = generate_shopping_list(queryset)
-            ShoppingCart.objects.filter(user=request.user).delete()
+        queryset = (RecipeIngredients.objects.
+                    filter(recipe__in_users_cart__user=request.user))
+        shopping_list = generate_shopping_list(queryset)
+        ShoppingCart.objects.filter(user=request.user).delete()
 
-            response = HttpResponse(shopping_list, 'Content-type: text/plain')
-            response['Content-Disposition'] = ('attachment; filename='
-                                               '"Shopping.txt"')
-            return response
+        response = HttpResponse(shopping_list, 'Content-type: text/plain')
+        response['Content-Disposition'] = ('attachment; filename='
+                                           '"Shopping.txt"')
+        return response
 
     def post(self, request, recipe_id):
         recipe = Recipe.objects.get(pk=recipe_id)
