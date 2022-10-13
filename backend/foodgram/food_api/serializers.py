@@ -263,9 +263,11 @@ class SubscribeSerializer(UserSerializer):
 
     def get_recipes(self, obj):
         request = self.context.get('request')
-        limit_value = int(request.GET.get('recipes_limit'))
+        try:
+            limit_value = int(request.GET.get('recipes_limit'))
+        except TypeError:
+            limit_value = 3
         recipes = obj.recipes.all()[:limit_value]
-        request = self.context.get('request')
         return ShortRecipeSerializer(
             recipes, many=True,
             context={'request': request}
